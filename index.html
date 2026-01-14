@@ -20,18 +20,22 @@
       background-color: var(--bg);
       color: var(--text);
       margin: 0; padding: 0;
-      line-height: 1.4;
+      line-height: 1.3;
     }
 
-    .container { max-width: 1100px; margin: 0 auto; padding: 15px; }
+    .container { max-width: 1100px; margin: 0 auto; padding: 10px; }
 
-    h2, h3 { color: var(--primary); text-align: center; margin-top: 10px; }
-    label { font-size: 11px; font-weight: bold; color: #555; display: block; margin-bottom: 2px; }
+    h2, h3 { color: var(--primary); text-align: center; margin: 8px 0; }
+    label { font-size: 10px; font-weight: bold; color: #555; display: block; margin-bottom: 1px; }
 
     input, select, button {
-      width: 100%; padding: 10px; font-size: 14px; margin-bottom: 8px;
+      width: 100%; padding: 8px; font-size: 14px; margin-bottom: 5px;
       border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; background: white;
     }
+
+    /* Requirement 33: Enforce numeric keyboards */
+    input[type="number"] { -moz-appearance: textfield; }
+    input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 
     @media (max-width: 768px) {
       input, select, textarea { font-size: 16px !important; }
@@ -39,52 +43,60 @@
 
     button {
       background-color: var(--primary); color: white; border: none;
-      font-weight: 600; cursor: pointer; transition: 0.2s;
+      font-weight: 600; cursor: pointer; transition: 0.1s;
     }
 
-    button:active { transform: scale(0.98); }
+    button:active { transform: scale(0.97); }
     .btn-green { background-color: var(--secondary); }
     .btn-red { background-color: var(--danger); }
     .btn-outline { background-color: #e5e8e8; color: var(--text); border: 1px solid #bdc3c7; }
 
     .card {
-      background: var(--card-bg); padding: 15px; border-radius: 12px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 15px; border: 1px solid #dcdde1;
+      background: var(--card-bg); padding: 12px; border-radius: 10px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 12px; border: 1px solid #dcdde1;
     }
 
-    .top-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
-    @media (min-width: 768px) { .top-grid { grid-template-columns: repeat(4, 1fr); } }
+    /* Requirement 32: Compact top grid */
+    .top-grid { 
+        display: grid; 
+        grid-template-columns: repeat(2, 1fr); 
+        gap: 5px; 
+        padding: 8px; 
+        margin-top: 10px;
+    }
+    .top-grid div { margin-bottom: 0; }
+    .top-grid input, .top-grid select { margin-bottom: 2px; padding: 6px; font-size: 13px; }
+
+    @media (min-width: 768px) { .top-grid { grid-template-columns: repeat(5, 1fr); } }
 
     .block {
-      border: 2px solid var(--primary); padding: 10px;
-      margin-bottom: 15px; border-radius: 10px; background: #fbfcfc;
+      border: 2px solid var(--primary); padding: 8px;
+      margin-bottom: 12px; border-radius: 8px; background: #fbfcfc;
     }
 
     .block-title {
-      font-weight: bold; margin-bottom: 8px; color: var(--primary);
+      font-weight: bold; margin-bottom: 6px; color: var(--primary); font-size: 14px;
       display: flex; justify-content: space-between; align-items: center;
     }
 
     .row {
       display: grid; grid-template-columns: 35px 2fr 1fr 1fr 35px 35px;
-      gap: 5px; margin-bottom: 6px; align-items: center;
+      gap: 4px; margin-bottom: 4px; align-items: center;
     }
 
     @media (max-width: 600px) {
       .row { grid-template-columns: 35px 2fr 1fr 1fr; }
-      .row .row-btns { grid-column: span 4; display: flex; gap: 5px; }
+      .row .row-btns { grid-column: span 4; display: flex; gap: 4px; }
     }
 
-    .seq-btn { background: #5d6d7e; font-size: 12px; padding: 5px; }
+    .seq-btn { background: #5d6d7e; font-size: 11px; padding: 4px; height: 34px; }
 
-    table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; background: white; }
-    th, td { border: 1px solid #ccc; padding: 6px; text-align: center; }
+    table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 12px; background: white; }
+    th, td { border: 1px solid #ccc; padding: 5px; text-align: center; }
     th { background: var(--primary); color: white; }
     .total-row { background: #eaeded; font-weight: bold; color: var(--primary); }
 
-    .compact-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 10px; }
-    .compact-table th { background: var(--secondary); padding: 4px; font-size: 11px; }
-    .matrix-table th { background: var(--primary); }
+    .compact-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 8px; }
     .matrix-table td:first-child { text-align: left; font-weight: bold; background: #f8f9f9; }
 
     .hidden { display: none; }
@@ -93,12 +105,13 @@
       .no-print, button, .no-print-force, #blocks, #colourMasterSection, hr, .btn-outline { 
         display: none !important; 
       }
-      body { background: white; font-size: 11px; }
+      body { background: white; font-size: 10px; }
       .container { max-width: 100%; padding: 0; }
-      .card { box-shadow: none; border: 1px solid #ddd; margin-bottom: 8px; }
-      .top-grid { grid-template-columns: repeat(4, 1fr); display: grid !important; }
+      .card { box-shadow: none; border: 1px solid #ddd; margin-bottom: 5px; padding: 5px; }
+      .top-grid { display: grid !important; grid-template-columns: repeat(5, 1fr); gap: 2px; }
+      .top-grid input, .top-grid select { border: none; font-size: 10px; background: none; -webkit-appearance: none; }
       table { border: 1px solid #000; }
-      th, td { border: 1px solid #000; padding: 3px; }
+      th, td { border: 1px solid #000; padding: 2px; }
     }
   </style>
 </head>
@@ -118,14 +131,15 @@
 
   <!-- EDITOR -->
   <div id="editorPage" class="hidden">
-    <div class="no-print" style="display:flex; gap:8px;">
+    <div class="no-print" style="display:flex; gap:6px;">
       <button class="btn-outline" style="width:70px" onclick="goHome()">Back</button>
       <button class="btn-green" onclick="saveDesign(true)">Save</button>
       <button class="btn-outline" onclick="saveDesign(false)">Save New</button>
       <button class="btn-outline" style="width:70px" onclick="window.print()">Print</button>
     </div>
 
-    <div class="card top-grid" style="margin-top:15px;">
+    <!-- Requirement 32: Compact Config section -->
+    <div class="card top-grid">
       <div><label>Main Count</label>
         <select id="yarnCount" onchange="onYarnChange()">
           <option value="">Select</option>
@@ -141,34 +155,33 @@
         </select>
       </div>
       <div><label>Length (Haat)</label><input type="number" step="any" inputmode="decimal" id="fabricHaat"></div>
-      <div><label>Reed</label><input type="number" step="any" id="reedValue" oninput="refreshAllRowThreads()"></div>
-      <div><label>Shrinkage (Inch)</label><input type="number" step="any" id="shrinkageInch" oninput="refreshAllRowThreads()"></div>
-      <div><label>Than</label><input type="number" step="any" id="thanValue" value="1"></div>
-      <div><label>Repeat</label><input type="number" step="any" id="designRepeat" value="1"></div>
-      <div><label>Wastage %</label><input type="number" step="any" id="wastagePercent" value="0"></div>
-      <div><label>Hank Len</label><input type="number" step="any" id="hankLength"></div>
+      <div><label>Reed</label><input type="number" step="any" inputmode="decimal" id="reedValue" oninput="refreshAllRowThreads()"></div>
+      <div><label>Shrinkage (In)</label><input type="number" step="any" inputmode="decimal" id="shrinkageInch" oninput="refreshAllRowThreads()"></div>
+      <div><label>Than</label><input type="number" step="any" inputmode="decimal" id="thanValue" value="1"></div>
+      <div><label>Repeat</label><input type="number" step="any" inputmode="decimal" id="designRepeat" value="1"></div>
+      <div><label>Wastage %</label><input type="number" step="any" inputmode="decimal" id="wastagePercent" value="0"></div>
+      <div><label>Hank Len</label><input type="number" step="any" inputmode="decimal" id="hankLength"></div>
       <div><label>Unit</label><select id="globalUnit" onchange="refreshAllRowThreads()"><option value="inch">Inch</option><option value="cm">CM</option></select></div>
       <div class="no-print"><label>Folder</label><select id="designFolderSelect" onchange="onFolderChangeInEditor()"></select></div>
     </div>
 
-    <div class="no-print"><button class="btn-outline" style="margin-bottom:10px" onclick="addBlock('border', 'Border (Top)', 1, [], true)">+ Add Top Border</button></div>
+    <div class="no-print"><button class="btn-outline" style="margin-bottom:8px" onclick="addBlock('border', 'Border (Top)', 1, [], true)">+ Add Top Border</button></div>
     
     <div id="blocks"></div>
     
-    <div class="no-print" style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+    <div class="no-print" style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
         <button class="btn-outline" onclick="addBlock('border', 'Border (Bottom)', 1)">+ Add Border</button>
         <button class="btn-outline" onclick="addBlock('design', 'Main Design', 3)">+ Add Design</button>
     </div>
 
-    <button class="no-print" style="margin:20px 0;" onclick="calculate()">Calculate Instruction</button>
+    <button class="no-print" style="margin:15px 0;" onclick="calculate()">Calculate Instruction</button>
 
     <div id="weaverTable"></div>
     <div id="dyeTable"></div>
 
-    <div class="no-print" style="margin-top:30px; padding-top:15px; border-top: 1px solid #ccc;">
+    <div class="no-print" style="margin-top:20px; padding-top:10px; border-top: 1px solid #ccc;">
       <button class="btn-outline" id="toggleColBtn" onclick="toggleColourMaster()">Show Folder Color Master</button>
-      <div id="colourMasterSection" class="hidden card" style="margin-top:10px;">
-          <p style="font-size: 11px; color: #666;">These colors are specific to the selected folder.</p>
+      <div id="colourMasterSection" class="hidden card" style="margin-top:8px;">
           <div id="colourRows"></div>
           <button class="btn-outline" onclick="addColourRow()">+ Add Color Entry</button>
           <button class="btn-green" onclick="saveColours()">Save Folder Colors</button>
@@ -178,7 +191,7 @@
 
   <!-- FOLDER VIEW -->
   <div id="folderPage" class="hidden">
-    <div class="no-print" style="display:flex; gap:10px; margin-bottom:20px;">
+    <div class="no-print" style="display:flex; gap:8px; margin-bottom:15px;">
         <button class="btn-outline" style="width:80px" onclick="goHome()">Back</button>
         <button class="btn-green" onclick="calculateFolderReport()">Generate Master Report</button>
         <button class="btn-outline" onclick="window.print()">Print Report</button>
@@ -457,7 +470,7 @@ function openDesign(idx) {
     document.getElementById('yarnCount').value = d.config.yarnCount;
     document.getElementById('fabricHaat').value = d.config.fabricHaat || "";
     document.getElementById('reedValue').value = d.config.reedValue;
-    document.getElementById('shrinkageInch').value = d.config.shrinkageInch || 4;
+    document.getElementById('shrinkageInch').value = d.config.shrinkageInch;
     document.getElementById('thanValue').value = d.config.thanValue || 1;
     document.getElementById('wastagePercent').value = d.config.wastagePercent;
     document.getElementById('hankLength').value = d.config.hankLength;
@@ -469,11 +482,9 @@ function openDesign(idx) {
     calculate();
 }
 
-// FOLDER-SPECIFIC COLOUR LOGIC
 function onFolderChangeInEditor() {
     activeFolderId = document.getElementById('designFolderSelect').value;
     loadColoursInEditor();
-    // Refresh all existing row dropdowns
     document.querySelectorAll('.color-sel').forEach(sel => {
         const currentVal = sel.value;
         fillColDropdown(sel, currentVal);
@@ -520,7 +531,6 @@ function fillColDropdown(sel, val) {
     sel.value = val;
 }
 
-// FOLDER MANAGEMENT
 function createNewFolder() {
     const n = prompt("Folder Name:"); if(!n) return;
     const db = getDB(); db.folders.push({ id: Date.now(), name: n });
@@ -542,7 +552,6 @@ function deleteFolder(id) {
     }
 }
 
-// MASTER REPORT (ONLY ON FOLDER PAGE)
 function calculateFolderReport() {
     const db = getDB();
     const designs = db.designs.filter(d => d.folderId == activeFolderId);
