@@ -5,7 +5,7 @@
 <head>
   <meta charset="UTF-8">
   <title>App-2 | Professional Yarn Planner</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
   <style>
     :root {
       --primary: #1a5276;
@@ -33,6 +33,13 @@
     input, select, button {
       width: 100%; padding: 10px; font-size: 14px; margin-bottom: 8px;
       border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; background: white;
+    }
+
+    /* Prevent mobile zoom by forcing 16px font size on small screens */
+    @media (max-width: 768px) {
+      input, select, textarea {
+        font-size: 16px !important;
+      }
     }
 
     button {
@@ -139,13 +146,13 @@
           <option value="56K">56K</option><option value="100K">100K</option>
         </select>
       </div>
-      <div><label>Length (Haat)</label><input type="number" id="fabricHaat"></div>
-      <div><label>Reed</label><input type="number" id="reedValue" oninput="refreshAllRowThreads()"></div>
-      <div><label>Shrinkage (Inch)</label><input type="number" id="shrinkageInch" value="4" oninput="refreshAllRowThreads()"></div>
-      <div><label>Than</label><input type="number" id="thanValue" value="1"></div>
-      <div><label>Repeat</label><input type="number" id="designRepeat" value="1"></div>
-      <div><label>Wastage %</label><input type="number" id="wastagePercent" value="0"></div>
-      <div><label>Hank Len</label><input type="number" id="hankLength"></div>
+      <div><label>Length (Haat)</label><input type="number" step="any" inputmode="decimal" id="fabricHaat"></div>
+      <div><label>Reed</label><input type="number" step="any" inputmode="decimal" id="reedValue" oninput="refreshAllRowThreads()"></div>
+      <div><label>Shrinkage (Inch)</label><input type="number" step="any" inputmode="decimal" id="shrinkageInch" value="4" oninput="refreshAllRowThreads()"></div>
+      <div><label>Than</label><input type="number" step="any" inputmode="decimal" id="thanValue" value="1"></div>
+      <div><label>Repeat</label><input type="number" step="any" inputmode="decimal" id="designRepeat" value="1"></div>
+      <div><label>Wastage %</label><input type="number" step="any" inputmode="decimal" id="wastagePercent" value="0"></div>
+      <div><label>Hank Len</label><input type="number" step="any" inputmode="decimal" id="hankLength"></div>
       <div><label>Unit</label><select id="globalUnit" onchange="refreshAllRowThreads()"><option value="inch">Inch</option><option value="cm">CM</option></select></div>
       <div class="no-print"><label>Folder</label><select id="designFolderSelect"></select></div>
     </div>
@@ -286,8 +293,8 @@ function createRow(c='', w='', t='') {
     const r = document.createElement('div');
     r.className = 'row';
     r.innerHTML = `<select class="color-sel"></select>
-        <input class="width" type="number" step="any" placeholder="W" oninput="updateRowThreads(this)" value="${w}">
-        <input class="threads" type="number" placeholder="T" oninput="updateRowThreads(this)" value="${t}">
+        <input class="width" type="number" step="any" inputmode="decimal" placeholder="W" oninput="updateRowThreads(this)" value="${w}">
+        <input class="threads" type="number" step="any" inputmode="decimal" placeholder="T" oninput="updateRowThreads(this)" value="${t}">
         <button class="btn-outline no-print-force" onclick="addRowBelow(this)">+</button>
         <button class="btn-red no-print-force" onclick="this.parentElement.remove()">×</button>`;
     fillColDropdown(r.querySelector('.color-sel'), c);
@@ -443,7 +450,6 @@ function calculateFolderReport() {
         const wast = parseFloat(d.config.wastagePercent)||0;
         const than = parseFloat(d.config.thanValue)||1;
 
-        // Consolidate colors for this specific design
         let designDyeConsolidated = {};
 
         d.blocks.forEach(b => {
@@ -457,11 +463,9 @@ function calculateFolderReport() {
                 const threads = (b.type === 'design' ? (r.t * rep) : parseFloat(r.t));
                 const hanks = (threads * fl * (1 + wast/100) / yarn.h) * than;
 
-                // Add to individual design table
                 if(!designDyeConsolidated[cName]) designDyeConsolidated[cName] = 0;
                 designDyeConsolidated[cName] += hanks;
 
-                // Add to master matrix
                 if(!matrix[p.color]) matrix[p.color] = {};
                 matrix[p.color][p.count] = (matrix[p.color][p.count] || 0) + hanks;
             });
