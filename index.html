@@ -1,5 +1,4 @@
 --- START OF FILE index.html ---
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -30,12 +29,11 @@
     label { font-size: 10px; font-weight: bold; color: #555; display: block; margin-bottom: 1px; }
 
     input, select, button {
-      width: 100%; padding: 8px; font-size: 16px; /* Fixed: 16px prevents mobile auto-zoom */
+      width: 100%; padding: 8px; font-size: 16px; 
       margin-bottom: 5px; border: 1px solid #ccc; border-radius: 6px; 
       box-sizing: border-box; background: white;
     }
 
-    /* Desktop font size can be smaller, but mobile must stay 16px for zoom fix */
     @media (min-width: 768px) {
         input, select, button { font-size: 14px; }
     }
@@ -66,46 +64,22 @@
     th, td { border: 1px solid #ccc; padding: 4px; text-align: center; }
     th { background: var(--primary); color: white; }
     .total-row { background: #eaeded; font-weight: bold; color: var(--primary); }
-
-    .matrix-table td:first-child { text-align: left; font-weight: bold; background: #f8f9f9; }
+    .subtotal-row { background: #f2f4f4; font-weight: bold; font-style: italic; color: #566573; }
 
     .hidden { display: none; }
 
     @media print {
-      .no-print, button, .no-print-force, hr, .block, #colourMasterSection, .folder-item-card { 
-          display: none !important; 
-      }
+      .no-print, button, .no-print-force, hr, .block, #colourMasterSection, .folder-item-card { display: none !important; }
       body { background: white; font-size: 10px; }
       .container { max-width: 100%; padding: 0; margin: 0; }
       .card { box-shadow: none; border: 1px solid #ddd; margin-bottom: 5px; padding: 5px; width: 100%; }
-      h2, h3 { text-align: left !important; margin-left: 0 !important; }
-      .top-grid { 
-          display: grid !important; 
-          grid-template-columns: repeat(5, 1fr) !important; 
-          border: 1px solid #000;
-          margin-bottom: 10px;
-          text-align: left;
-      }
-      .top-grid div { border-right: 1px solid #eee; padding: 2px; }
-      .top-grid input, .top-grid select { 
-          border: none !important; font-weight: bold; font-size: 10px;
-          -webkit-appearance: none; appearance: none; background: none !important;
-      }
-      .weaver-table-container { 
-          column-count: 3; column-gap: 15px; text-align: left !important;
-          display: block !important; width: 100% !important; margin: 0 !important;
-      }
-      .weaver-table-container table { break-inside: avoid; width: 100% !important; margin-left: 0 !important; }
-      #dyeTable { width: fit-content !important; margin-left: 0 !important; }
-      #dyeTable table { width: 100%; border: 1px solid #000; }
-      h3 { margin: 10px 0 5px 0; font-size: 12px; color: #000; border-bottom: 1px solid #000; }
+      .top-grid { display: grid !important; grid-template-columns: repeat(5, 1fr) !important; border: 1px solid #000; margin-bottom: 10px; }
     }
   </style>
 </head>
 <body>
 
 <div class="container">
-  <!-- HOME -->
   <div id="homePage">
     <h2>🧵 Yarn Planner Pro</h2>
     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-bottom:10px;">
@@ -123,7 +97,6 @@
     <div id="designList"></div>
   </div>
 
-  <!-- EDITOR -->
   <div id="editorPage" class="hidden">
     <div class="no-print" style="display:flex; gap:6px;">
       <button class="btn-outline" style="width:70px" onclick="goHome()">Back</button>
@@ -168,10 +141,10 @@
 
     <button class="no-print" style="margin:15px 0;" onclick="calculate()">Calculate Instruction</button>
 
-    <h3 id="weaverHead">Weaver Instruction</h3>
+    <h3>Weaver Instruction</h3>
     <div id="weaverTable" class="weaver-table-container"></div>
     
-    <h3 id="dyeHead">Dyeing Instruction</h3>
+    <h3>Dyeing Instruction</h3>
     <div id="dyeTable"></div>
 
     <div class="no-print" style="margin-top:20px; padding-top:10px; border-top: 1px solid #ccc;">
@@ -179,12 +152,11 @@
       <div id="colourMasterSection" class="hidden card" style="margin-top:8px;">
           <div id="colourRows"></div>
           <button class="btn-outline" onclick="addColourRow()">+ Add Color Entry</button>
-          <button class="btn-green" onclick="saveColours()">Save & Sync Colors</button>
+          <button class="btn-green" onclick="saveColours()">Save & Sync Colors Across Folder</button>
       </div>
     </div>
   </div>
 
-  <!-- FOLDER VIEW -->
   <div id="folderPage" class="hidden">
     <div class="no-print" style="display:flex; gap:8px; margin-bottom:15px;">
         <button class="btn-outline" style="width:80px" onclick="goHome()">Back</button>
@@ -212,7 +184,8 @@ const YARN_LIB = {
 
 let activeDesignIdx = null; 
 let activeFolderId = null;
-const STORAGE_KEY = 'app2_locked_v2';
+let activeCopyTarget = null;
+const STORAGE_KEY = 'app2_locked_v3';
 
 function getDB() { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{"designs":[], "folders":[], "folderColours":{}}'); }
 function saveDB(db) { localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); }
@@ -243,10 +216,8 @@ function importData(event) {
     reader.onload = (e) => {
         try {
             const json = JSON.parse(e.target.result);
-            if (confirm("Replace existing data with backup?")) {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(json)); loadHome();
-            }
-        } catch (err) { alert("Invalid backup file."); }
+            if (confirm("Replace existing data?")) { localStorage.setItem(STORAGE_KEY, JSON.stringify(json)); loadHome(); }
+        } catch (err) { alert("Invalid file."); }
     };
     reader.readAsText(file);
 }
@@ -272,7 +243,6 @@ function resetEditor() {
     document.getElementById('dyeTable').innerHTML = '';
     document.getElementById('fabricHaat').value = "29";
     document.getElementById('designNameField').value = "";
-    document.getElementById('thanValue').value = 1;
     document.getElementById('yarnCount').value = "";
     updateFolderDropdown();
     if(activeFolderId) document.getElementById('designFolderSelect').value = activeFolderId;
@@ -294,9 +264,9 @@ function updateRowThreads(input) {
     const row = input.closest('.row');
     const reed = parseFloat(document.getElementById('reedValue').value) || 1;
     const shrinkage = parseFloat(document.getElementById('shrinkageInch').value) || 0;
+    const factor = reed + shrinkage;
     const unit = document.getElementById('globalUnit').value;
     const wInp = row.querySelector('.width'), tInp = row.querySelector('.threads');
-    const factor = reed + shrinkage;
     if(input.classList.contains('width')) {
         const inch = unit === 'cm' ? (parseFloat(wInp.value)||0)/2.54 : (parseFloat(wInp.value)||0);
         tInp.value = Math.round(inch * factor);
@@ -321,213 +291,126 @@ function createRow(c='', w='', t='') {
     return r;
 }
 
-function renumberRows() {
-    let count = 1; document.querySelectorAll('.row-num').forEach(el => el.innerText = count++);
-}
-
+function renumberRows() { let count = 1; document.querySelectorAll('.row-num').forEach(el => el.innerText = count++); }
 function addRowBelow(btn) { btn.closest('.row').after(createRow()); renumberRows(); }
 
+function toggleCopyMode(btn) {
+    const container = btn.closest('.block').querySelector('.row-container');
+    if (activeCopyTarget === container) {
+        activeCopyTarget = null; btn.innerText = "Copy from Design"; btn.classList.remove('btn-green');
+    } else {
+        document.querySelectorAll('.copy-mode-btn').forEach(b => { b.innerText = "Copy from Design"; b.classList.remove('btn-green'); });
+        activeCopyTarget = container; btn.innerText = "Finish Copying"; btn.classList.add('btn-green');
+    }
+}
+
 function copyRowToBottom(btn) {
-    btn.classList.add('btn-green');
-    setTimeout(() => btn.classList.remove('btn-green'), 500);
     const row = btn.closest('.row'); 
-    const container = row.closest('.row-container');
-    container.appendChild(createRow(row.querySelector('.color-sel').value, row.querySelector('.width').value, row.querySelector('.threads').value));
+    const c = row.querySelector('.color-sel').value, w = row.querySelector('.width').value, t = row.querySelector('.threads').value;
+    if(activeCopyTarget) {
+        activeCopyTarget.appendChild(createRow(c, w, t));
+        btn.classList.add('btn-green'); setTimeout(() => btn.classList.remove('btn-green'), 300);
+    } else {
+        row.closest('.row-container').appendChild(createRow(c, w, t));
+    }
     renumberRows();
 }
 
 function addBlock(type, title, numRows, rowsData = [], atTop = false) {
     const b = document.createElement('div'); b.className = 'block'; b.dataset.type = type;
-    b.innerHTML = `<div class="block-title">${title} <button class="btn-red no-print-force" style="width:auto; padding:2px 8px;" onclick="this.parentElement.parentElement.remove(); renumberRows();">×</button></div><div class="row-container"></div>`;
+    let copyBtn = (type === 'border') ? `<button class="btn-outline no-print-force copy-mode-btn" style="width:auto; padding:2px 8px; font-size:10px; margin:0 5px;" onclick="toggleCopyMode(this)">Copy from Design</button>` : '';
+    b.innerHTML = `<div class="block-title"><span>${title} ${copyBtn}</span><button class="btn-red no-print-force" style="width:auto; padding:2px 8px;" onclick="removeBlock(this)">×</button></div><div class="row-container"></div>`;
     const container = b.querySelector('.row-container');
     if(rowsData.length > 0) rowsData.forEach(rd => container.appendChild(createRow(rd.c, rd.w, rd.t)));
     else for(let i=0; i<numRows; i++) container.appendChild(createRow());
-    
-    const blocksParent = document.getElementById('blocks');
-    if(atTop) blocksParent.prepend(b);
-    else blocksParent.appendChild(b);
+    if(atTop) document.getElementById('blocks').prepend(b); else document.getElementById('blocks').appendChild(b);
     renumberRows();
 }
 
-function calculate() {
-    const repeat = parseFloat(document.getElementById('designRepeat').value) || 1;
-    const haat = parseFloat(document.getElementById('fabricHaat').value) || 0;
-    const than = parseFloat(document.getElementById('thanValue').value) || 1;
-    const dCount = document.getElementById('yarnCount').value;
-    let dye = {}, seq = 1;
-    let totalDSum = 0, totalBSum = 0;
+function removeBlock(btn) { const b = btn.closest('.block'); if (activeCopyTarget === b.querySelector('.row-container')) activeCopyTarget = null; b.remove(); renumberRows(); }
 
-    let wHtml = `<table><tr><th>Seq</th><th>Colour</th><th>Threads</th></tr>`;
+function calculate() {
+    const repeat = parseFloat(document.getElementById('designRepeat').value) || 1, haat = parseFloat(document.getElementById('fabricHaat').value) || 0, than = parseFloat(document.getElementById('thanValue').value) || 1, dCount = document.getElementById('yarnCount').value;
+    let dye = {}, seq = 1, totalDSum = 0, totalBSum = 0, wHtml = `<table><tr><th>Seq</th><th>Colour</th><th>Threads</th></tr>`;
     document.querySelectorAll('.block').forEach(b => {
-        const type = b.dataset.type;
-        let blockTotal = 0;
+        const type = b.dataset.type; let blockThreads = 0;
         wHtml += `<tr style="background:#f8f9f9"><td colspan="3"><b>${type.toUpperCase()}</b></td></tr>`;
         b.querySelectorAll('.row').forEach(r => {
-            const c = r.querySelector('.color-sel').value.trim();
-            const t = parseFloat(r.querySelector('.threads').value) || 0;
+            const c = r.querySelector('.color-sel').value.trim(), t = parseFloat(r.querySelector('.threads').value) || 0;
             if(!c || t <= 0) return;
             wHtml += `<tr><td>${seq++}</td><td>${c}</td><td>${t}</td></tr>`;
-            
-            const p = parseColorEntry(c, dCount);
-            const yarn = YARN_LIB[p.count] || { h: parseFloat(document.getElementById('hankLength').value) || 3000 };
-            
-            const thRepeated = (type === 'design' ? (t * repeat) : t);
-            const consumptionHanks = (thRepeated * haat * than) / yarn.h;
-            
-            if(!dye[c]) dye[c] = { hanks: 0, threadsPerThan: 0, totalThreads: 0 };
-            dye[c].hanks += consumptionHanks;
-            dye[c].threadsPerThan += thRepeated;
-            dye[c].totalThreads += (thRepeated * than);
-            
-            if(type === 'design') totalDSum += t; else totalBSum += t;
+            if(!dye[c]) dye[c] = { inRepeat: 0, inBorder: 0 };
+            if(type === 'design') { dye[c].inRepeat += t; totalDSum += t; } else { dye[c].inBorder += t; totalBSum += t; }
+            blockThreads += t;
         });
+        wHtml += `<tr class="subtotal-row"><td></td><td>Block Total</td><td>${blockThreads}</td></tr>`;
     });
-
     const grandTotal = (totalDSum * repeat) + totalBSum; 
-    const reed = document.getElementById('reedValue').value;
-    wHtml += `<tr class="total-row"><td>Reed: ${reed}</td><td>Drum: ${(grandTotal/reed).toFixed(2)}</td><td>(${totalDSum} × ${repeat}) + ${totalBSum} = ${grandTotal}</td></tr></table>`;
+    wHtml += `<tr class="total-row"><td>Reed: ${document.getElementById('reedValue').value}</td><td>Drum: ${(grandTotal/(parseFloat(document.getElementById('reedValue').value)||1)).toFixed(2)}</td><td>Threads/Repeat: ${totalDSum}<br>(${totalDSum} × ${repeat}) + ${totalBSum} = ${grandTotal}</td></tr></table>`;
     document.getElementById('weaverTable').innerHTML = wHtml;
 
-    // Dyeing Table with new Column and Totals
-    let dyeTotalThreads = 0;
-    let dyeTotalHanks = 0;
-    let dHtml = `<table><tr><th>Colour</th><th>Total Threads</th><th>Threads/Than</th><th>Hanks</th></tr>`;
+    let dSumRep = 0, dSumBord = 0, dSumThan = 0, dSumTotal = 0, dSumHanks = 0;
+    let dHtml = `<table><tr><th>Colour</th><th>In Repeat</th><th>In Border</th><th>Threads/Than</th><th>Total Threads</th><th>Hanks</th></tr>`;
     for(let c in dye) {
-        dHtml += `<tr>
-            <td style="text-align:left">${c}</td>
-            <td>${Math.round(dye[c].totalThreads)}</td>
-            <td>${Math.round(dye[c].threadsPerThan)}</td>
-            <td>${dye[c].hanks.toFixed(2)}</td>
-        </tr>`;
-        dyeTotalThreads += dye[c].totalThreads;
-        dyeTotalHanks += dye[c].hanks;
+        const p = parseColorEntry(c, dCount), yarn = YARN_LIB[p.count] || { h: parseFloat(document.getElementById('hankLength').value) || 3000 };
+        const tpt = (dye[c].inRepeat * repeat) + dye[c].inBorder, tt = tpt * than, hanks = (tt * haat) / yarn.h;
+        dHtml += `<tr><td style="text-align:left">${c}</td><td>${Math.round(dye[c].inRepeat)}</td><td>${Math.round(dye[c].inBorder)}</td><td>${Math.round(tpt)}</td><td>${Math.round(tt)}</td><td>${hanks.toFixed(2)}</td></tr>`;
+        dSumRep += dye[c].inRepeat; dSumBord += dye[c].inBorder; dSumThan += tpt; dSumTotal += tt; dSumHanks += hanks;
     }
-    dHtml += `<tr class="total-row">
-        <td>TOTAL</td>
-        <td>${Math.round(dyeTotalThreads)}</td>
-        <td>-</td>
-        <td>${dyeTotalHanks.toFixed(2)}</td>
-    </tr></table>`;
+    dHtml += `<tr class="total-row"><td>TOTAL</td><td>${Math.round(dSumRep)}</td><td>${Math.round(dSumBord)}</td><td>${Math.round(dSumThan)}</td><td>${Math.round(dSumTotal)}</td><td>${dSumHanks.toFixed(2)}</td></tr></table>`;
     document.getElementById('dyeTable').innerHTML = dHtml;
 }
 
 function saveDesign(isUpdate) {
-    const db = getDB();
-    const name = document.getElementById('designNameField').value.trim();
-    if(!name) { alert("Please enter a Design Name"); return; }
-
-    const config = {
-        yarnCount: document.getElementById('yarnCount').value, fabricHaat: document.getElementById('fabricHaat').value,
-        reedValue: document.getElementById('reedValue').value, shrinkageInch: document.getElementById('shrinkageInch').value,
-        hankLength: document.getElementById('hankLength').value, designRepeat: document.getElementById('designRepeat').value,
-        globalUnit: document.getElementById('globalUnit').value, thanValue: document.getElementById('thanValue').value
-    };
+    const db = getDB(), name = document.getElementById('designNameField').value.trim();
+    if(!name) return alert("Name required");
+    const config = { yarnCount: document.getElementById('yarnCount').value, fabricHaat: document.getElementById('fabricHaat').value, reedValue: document.getElementById('reedValue').value, shrinkageInch: document.getElementById('shrinkageInch').value, hankLength: document.getElementById('hankLength').value, designRepeat: document.getElementById('designRepeat').value, globalUnit: document.getElementById('globalUnit').value, thanValue: document.getElementById('thanValue').value };
     const blocks = [];
     document.querySelectorAll('.block').forEach(b => {
-        const rows = [];
-        b.querySelectorAll('.row').forEach(r => {
-            rows.push({ c: r.querySelector('.color-sel').value, w: r.querySelector('.width').value, t: r.querySelector('.threads').value });
-        });
-        blocks.push({ type: b.dataset.type, title: b.querySelector('.block-title').innerText.replace('×','').trim(), rows });
+        const rows = []; b.querySelectorAll('.row').forEach(r => rows.push({ c: r.querySelector('.color-sel').value, w: r.querySelector('.width').value, t: r.querySelector('.threads').value }));
+        blocks.push({ type: b.dataset.type, title: b.querySelector('.block-title span').innerText.split(' ')[0], rows });
     });
     const folderId = document.getElementById('designFolderSelect').value;
-    
-    if(isUpdate && activeDesignIdx !== null) {
-        db.designs[activeDesignIdx].name = name;
-        db.designs[activeDesignIdx].config = config; 
-        db.designs[activeDesignIdx].blocks = blocks; 
-        db.designs[activeDesignIdx].folderId = folderId;
-    } else {
-        db.designs.push({ name, folderId, config, blocks });
-    }
+    if(isUpdate && activeDesignIdx !== null) { db.designs[activeDesignIdx] = { name, folderId, config, blocks }; }
+    else { db.designs.push({ name, folderId, config, blocks }); }
     saveDB(db); goHome();
 }
 
 function loadHome() {
-    const db = getDB(); const fList = document.getElementById('folderList'), dList = document.getElementById('designList');
+    const db = getDB(), fList = document.getElementById('folderList'), dList = document.getElementById('designList');
     fList.innerHTML = ''; dList.innerHTML = '';
-    db.folders.forEach(f => {
-        fList.innerHTML += `<div class="card"><strong>📁 ${f.name}</strong><div style="display:flex; gap:5px; margin-top:10px;">
-            <button onclick="viewFolder(${f.id})">Open</button>
-            <button class="btn-red" style="width:60px" onclick="deleteFolder(${f.id})">×</button></div></div>`;
-    });
-    db.designs.forEach((d, i) => {
-        if(!d.folderId) {
-            dList.innerHTML += `<div class="card"><strong>${d.name}</strong> (${d.config.yarnCount})<div style="display:flex; gap:5px; margin-top:10px;">
-                <button onclick="openDesign(${i})">Edit</button>
-                <button class="btn-red" style="width:60px" onclick="deleteDesign(${i})">×</button></div></div>`;
-        }
-    });
+    db.folders.forEach(f => fList.innerHTML += `<div class="card"><strong>📁 ${f.name}</strong><div style="display:flex; gap:5px; margin-top:10px;"><button onclick="viewFolder(${f.id})">Open</button><button class="btn-red" style="width:60px" onclick="deleteFolder(${f.id})">×</button></div></div>`);
+    db.designs.forEach((d, i) => { if(!d.folderId) dList.innerHTML += `<div class="card"><strong>${d.name}</strong><div style="display:flex; gap:5px; margin-top:10px;"><button onclick="openDesign(${i})">Edit</button><button class="btn-red" style="width:60px" onclick="deleteDesign(${i})">×</button></div></div>`; });
 }
 
 function viewFolder(id) {
-    activeFolderId = id; const db = getDB(); const f = db.folders.find(x => x.id == id);
+    activeFolderId = id; const db = getDB(), f = db.folders.find(x => x.id == id);
     document.getElementById('homePage').classList.add('hidden');
     document.getElementById('folderPage').classList.remove('hidden');
     document.getElementById('folderTitle').innerText = f.name;
-    document.getElementById('folderReportArea').innerHTML = '';
     const container = document.getElementById('folderContent');
-    container.innerHTML = `<button class="btn-green no-print" onclick="createNewDesign()">+ New Design</button>`;
-    db.designs.forEach((d, i) => {
-        if(d.folderId == id) container.innerHTML += `<div class="card folder-item-card"><strong>${d.name}</strong><button class="btn-outline" style="margin-top:5px" onclick="openDesign(${i})">Edit</button></div>`;
-    });
+    container.innerHTML = `<button class="btn-green no-print" onclick="createNewDesignFromFolder(${id})">+ New Design</button>`;
+    db.designs.forEach((d, i) => { if(d.folderId == id) container.innerHTML += `<div class="card folder-item-card"><strong>${d.name}</strong><button class="btn-outline" style="margin-top:5px" onclick="openDesign(${i})">Edit</button></div>`; });
 }
 
+function createNewDesignFromFolder(id) { activeFolderId = id; createNewDesign(); }
+
 function openDesign(idx) {
-    const db = getDB(); const d = db.designs[idx]; activeDesignIdx = idx; activeFolderId = d.folderId;
-    document.getElementById('homePage').classList.add('hidden');
-    document.getElementById('folderPage').classList.add('hidden');
-    document.getElementById('editorPage').classList.remove('hidden');
+    const db = getDB(), d = db.designs[idx]; activeDesignIdx = idx; activeFolderId = d.folderId;
+    document.getElementById('homePage').classList.add('hidden'); document.getElementById('editorPage').classList.remove('hidden');
     updateFolderDropdown(); const c = d.config;
-    document.getElementById('designNameField').value = d.name || "";
+    document.getElementById('designNameField').value = d.name;
     document.getElementById('yarnCount').value = c.yarnCount; 
-    document.getElementById('fabricHaat').value = c.fabricHaat || "29";
+    document.getElementById('fabricHaat').value = c.fabricHaat;
     document.getElementById('reedValue').value = c.reedValue; 
     document.getElementById('shrinkageInch').value = c.shrinkageInch;
-    document.getElementById('thanValue').value = c.thanValue || 1; 
+    document.getElementById('thanValue').value = c.thanValue; 
     document.getElementById('hankLength').value = c.hankLength;
     document.getElementById('designRepeat').value = c.designRepeat; 
     document.getElementById('designFolderSelect').value = d.folderId;
     document.getElementById('blocks').innerHTML = ''; 
     d.blocks.forEach(b => addBlock(b.type, b.title, 0, b.rows));
     loadColoursInEditor(); calculate();
-}
-
-function calculateFolderReport() {
-    const db = getDB(); const designs = db.designs.filter(d => d.folderId == activeFolderId);
-    if(!designs.length) return;
-    let html = `<h3>Summary Reports</h3><div class="compact-grid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap:10px;">`;
-    let matrix = {}; let allCounts = new Set();
-    designs.forEach(d => {
-        const haat = parseFloat(d.config.fabricHaat)||0, than = parseFloat(d.config.thanValue)||1, dCount = d.config.yarnCount, rep = parseFloat(d.config.designRepeat)||1;
-        let designDye = {};
-        d.blocks.forEach(b => {
-            b.rows.forEach(r => {
-                if(!r.c || !r.t) return;
-                const p = parseColorEntry(r.c, dCount); allCounts.add(p.count);
-                const yarn = YARN_LIB[p.count] || { h: parseFloat(d.config.hankLength) || 3000 };
-                const threads = (b.type === 'design' ? (r.t * rep) : parseFloat(r.t));
-                const hanks = (threads * haat * than) / yarn.h;
-                designDye[r.c] = (designDye[r.c] || 0) + hanks;
-                if(!matrix[p.color]) matrix[p.color] = {};
-                matrix[p.color][p.count] = (matrix[p.color][p.count] || 0) + hanks;
-            });
-        });
-        html += `<div class="card"><b>${d.name}</b><table>`;
-        for(let col in designDye) html += `<tr><td style="text-align:left">${col}</td><td>${designDye[col].toFixed(2)}</td></tr>`;
-        html += `</table></div>`;
-    });
-    html += `</div><h3>Master Matrix</h3><div class="card"><table class="matrix-table"><tr><th>Colour</th>`;
-    const sortedCounts = Array.from(allCounts).sort();
-    sortedCounts.forEach(c => html += `<th>${c}</th>`);
-    html += `<th>Total</th></tr>`;
-    for(let col in matrix) {
-        html += `<tr><td>${col}</td>`; let rowTotal = 0;
-        sortedCounts.forEach(c => { const val = matrix[col][c] || 0; html += `<td>${val > 0 ? val.toFixed(2) : '-'}</td>`; rowTotal += val; });
-        html += `<td class="total-row">${rowTotal.toFixed(2)}</td></tr>`;
-    }
-    html += `</table></div>`;
-    document.getElementById('folderReportArea').innerHTML = html;
 }
 
 function onFolderChangeInEditor() { 
@@ -537,84 +420,60 @@ function onFolderChangeInEditor() {
 }
 
 function loadColoursInEditor() { 
-    const db = getDB(); 
-    const colors = db.folderColours[activeFolderId || "uncategorized"] || []; 
-    const container = document.getElementById('colourRows'); 
-    container.innerHTML = ''; 
+    const db = getDB(), colors = activeFolderId ? (db.folderColours[activeFolderId] || []) : []; 
+    const container = document.getElementById('colourRows'); container.innerHTML = ''; 
     colors.forEach(c => addColourRow(c)); 
 }
 
-function toggleColourMaster() { 
-    const sec = document.getElementById('colourMasterSection'); 
-    sec.classList.toggle('hidden'); 
-    document.getElementById('toggleColBtn').innerText = sec.classList.contains('hidden') ? "Show Color Master" : "Hide Color Master"; 
-}
-
+function toggleColourMaster() { const sec = document.getElementById('colourMasterSection'); sec.classList.toggle('hidden'); document.getElementById('toggleColBtn').innerText = sec.classList.contains('hidden') ? "Show Color Master" : "Hide Color Master"; }
 function addColourRow(v='') { 
-    const d = document.createElement('div'); 
-    d.className = 'row'; 
-    d.style.gridTemplateColumns = "1fr 45px"; 
+    const d = document.createElement('div'); d.className = 'row'; d.style.gridTemplateColumns = "1fr 45px"; 
     d.innerHTML = `<input class="master-color-input" data-old-val="${v}" value="${v}"><button class="btn-red" onclick="this.parentElement.remove()">×</button>`; 
     document.getElementById('colourRows').appendChild(d); 
 }
 
 function saveColours() { 
-    const db = getDB(); 
-    const colorInputs = document.querySelectorAll('.master-color-input');
-    const oldToNewMap = {};
-    const newCols = [];
-
+    const db = getDB(); if(!activeFolderId) return alert("Select folder first");
+    const colorInputs = document.querySelectorAll('.master-color-input'), oldToNewMap = {}, newCols = [];
     colorInputs.forEach(i => {
-        const oldVal = i.getAttribute('data-old-val');
-        const newVal = i.value.trim();
-        if(newVal) {
-            newCols.push(newVal);
-            if(oldVal && oldVal !== newVal) oldToNewMap[oldVal] = newVal;
+        const oldVal = i.getAttribute('data-old-val'), newVal = i.value.trim();
+        if(newVal) { newCols.push(newVal); if(oldVal && oldVal !== newVal) oldToNewMap[oldVal] = newVal; }
+    });
+
+    // 1. Update Folder's Master List
+    db.folderColours[activeFolderId] = newCols; 
+
+    // 2. Automatically sync all designs in this folder
+    db.designs.forEach(design => {
+        if(design.folderId == activeFolderId) {
+            design.blocks.forEach(block => {
+                block.rows.forEach(row => {
+                    if(oldToNewMap[row.c]) row.c = oldToNewMap[row.c];
+                    // If a color was deleted from master, we keep it in design unless user changes it manually
+                });
+            });
         }
     });
 
-    // Requirement 5: Sync existing design rows with edited names
-    document.querySelectorAll('.color-sel').forEach(sel => {
-        const currentVal = sel.value;
-        if(oldToNewMap[currentVal]) {
-            // We update the selection after filling the dropdown
-        }
-    });
-
-    db.folderColours[activeFolderId || "uncategorized"] = newCols; 
     saveDB(db); 
 
-    // Refresh dropdowns and apply synced names
+    // Refresh UI dropdowns in current editor
     document.querySelectorAll('.color-sel').forEach(sel => {
         const oldVal = sel.value;
         fillColDropdown(sel, oldToNewMap[oldVal] || oldVal);
     });
-
-    toggleColourMaster(); 
+    toggleColourMaster(); alert("Sync Complete: All designs in this folder updated.");
 }
 
 function fillColDropdown(sel, val) { 
-    const db = getDB(); 
-    const colors = db.folderColours[activeFolderId || "uncategorized"] || []; 
+    const db = getDB(), colors = activeFolderId ? (db.folderColours[activeFolderId] || []) : []; 
     sel.innerHTML = `<option value="">Color</option>`; 
     colors.forEach(c => sel.innerHTML += `<option value="${c}">${c}</option>`); 
     sel.value = val; 
 }
 
-function createNewFolder() { 
-    const n = prompt("Folder Name:"); if(!n) return; 
-    const db = getDB(); 
-    db.folders.push({ id: Date.now(), name: n }); 
-    saveDB(db); 
-    loadHome(); 
-}
-
-function updateFolderDropdown() { 
-    const sel = document.getElementById('designFolderSelect'); 
-    sel.innerHTML = `<option value="">Uncategorized</option>`; 
-    getDB().folders.forEach(f => sel.innerHTML += `<option value="${f.id}">${f.name}</option>`); 
-}
-
+function createNewFolder() { const n = prompt("Folder Name:"); if(n) { const db = getDB(); db.folders.push({ id: Date.now(), name: n }); saveDB(db); loadHome(); } }
+function updateFolderDropdown() { const sel = document.getElementById('designFolderSelect'); sel.innerHTML = `<option value="">Uncategorized</option>`; getDB().folders.forEach(f => sel.innerHTML += `<option value="${f.id}">${f.name}</option>`); }
 function deleteDesign(i) { if(confirm("Delete?")) { const db = getDB(); db.designs.splice(i,1); saveDB(db); loadHome(); } }
 function deleteFolder(id) { if(confirm("Delete folder?")) { const db = getDB(); db.folders = db.folders.filter(f => f.id != id); db.designs.forEach(d => { if(d.folderId == id) d.folderId = ""; }); saveDB(db); loadHome(); } }
 
