@@ -68,51 +68,74 @@
 
     .hidden { display: none !important; }
 
+    /* --- PRINT STYLES --- */
     @media print {
-      @page { size: portrait; margin: 1cm; }
+      @page { size: portrait; margin: 1.2cm; }
+      
+      body { background: white; font-size: 10pt; color: black; font-family: "Segoe UI", Arial, sans-serif; }
       .no-print, button, .no-print-force, hr, .block, #colourMasterSection, .folder-item-card { display: none !important; }
       
-      body { background: white; font-size: 9pt; color: black; }
       .container { max-width: 100%; padding: 0; margin: 0; }
-      
-      h3 { text-align: left; font-size: 10pt; margin: 10px 0 5px 0; }
-      
-      .card { 
-        box-shadow: none; 
-        border: 1px solid #000; 
-        margin-bottom: 10px; 
-        padding: 5px; 
-        width: 100%;
-        margin-left: 0;
-      }
-      
-      .top-grid { 
+      h2 { font-size: 14pt; margin-bottom: 5px; text-align: left; border-bottom: 2px solid #000; padding-bottom: 5px; }
+      h3 { font-size: 11pt; margin: 15px 0 5px 0; text-align: left; text-transform: uppercase; border-left: 4px solid #333; padding-left: 8px; }
+
+      /* Summary Grid at top */
+      .card.top-grid { 
         display: grid !important; 
-        grid-template-columns: repeat(3, 1fr) !important; 
-        gap: 5px !important;
+        grid-template-columns: repeat(4, 1fr) !important; 
+        border: 1px solid #000 !important; 
+        box-shadow: none !important;
+        padding: 10px !important;
+        margin-bottom: 15px !important;
+        gap: 10px !important;
       }
       
+      .top-grid div { border-bottom: 0.5pt solid #eee; }
+      .top-grid label { font-size: 8pt; text-transform: uppercase; color: #666; }
       .top-grid input, .top-grid select { 
         border: none !important; 
-        font-size: 9pt !important; 
-        background: transparent !important; 
-        padding: 0 !important;
+        font-size: 10pt !important; 
+        font-weight: bold !important;
+        padding: 2px 0 !important;
+        background: transparent !important;
         appearance: none;
       }
 
+      /* Tables Optimization */
       table { 
-        width: 100% !important;
-        margin-left: 0; 
-        font-size: 9pt;
+        width: auto !important; /* Shrink to content */
+        min-width: 60%;
+        margin-bottom: 20px;
+        border: 1.5pt solid #000 !important;
+        page-break-inside: auto;
       }
+      
+      tr { page-break-inside: avoid; page-break-after: auto; }
       
       th, td { 
-        padding: 3px !important; 
+        padding: 4px 8px !important; 
+        border: 0.5pt solid #000 !important;
+        font-size: 10pt !important;
         text-align: left !important;
-        border: 1px solid #444 !important;
+      }
+
+      th { background-color: #f2f2f2 !important; color: #000 !important; font-weight: bold; }
+
+      /* Force minimum column widths for numbers */
+      th:not(:nth-child(2)), 
+      td:not(:nth-child(2)) { 
+        width: 1%; 
+        white-space: nowrap; 
+        text-align: center !important; 
+      }
+
+      .total-row, .subtotal-row { 
+        background: #f9f9f9 !important; 
+        color: black !important; 
+        font-weight: bold !important; 
       }
       
-      .total-row, .subtotal-row { background: #eee !important; color: black !important; }
+      .weaver-table-container table { width: 100% !important; }
     }
   </style>
 </head>
@@ -139,6 +162,7 @@
 
   <!-- EDITOR PAGE -->
   <div id="editorPage" class="hidden">
+    <h2 class="no-print">Design Editor</h2>
     <div class="no-print" style="display:flex; gap:6px;">
       <button class="btn-outline" style="width:70px" onclick="goHome()">Back</button>
       <button class="btn-green" onclick="saveDesign(true)">Save</button>
@@ -148,7 +172,7 @@
 
     <div class="card top-grid">
       <div style="grid-column: span 2;"><label>Design Name</label><input type="text" id="designNameField" placeholder="Enter Design Name"></div>
-      <div style="grid-column: span 2;"><label>Folder</label><select id="designFolderSelect" onchange="onFolderChangeInEditor()"></select></div>
+      <div style="grid-column: span 2;" class="no-print"><label>Folder</label><select id="designFolderSelect" onchange="onFolderChangeInEditor()"></select></div>
       <div><label>Main Count</label>
         <select id="yarnCount" onchange="onYarnChange()">
           <option value="">Select</option>
@@ -163,12 +187,12 @@
           <option value="56K">56K</option><option value="100K">100K</option>
         </select>
       </div>
-      <div><label>Length (Haat)</label><input type="number" step="any" inputmode="decimal" id="fabricHaat" value="29"></div>
-      <div><label>Reed</label><input type="number" step="any" inputmode="decimal" id="reedValue" oninput="refreshAllRowThreads()"></div>
-      <div><label>Shrinkage (In)</label><input type="number" step="any" inputmode="decimal" id="shrinkageInch" oninput="refreshAllRowThreads()"></div>
-      <div><label>Than</label><input type="number" step="any" inputmode="decimal" id="thanValue" value="1"></div>
-      <div><label>Repeat</label><input type="number" step="any" inputmode="decimal" id="designRepeat" value="1"></div>
-      <div><label>Hank Len</label><input type="number" step="any" inputmode="decimal" id="hankLength"></div>
+      <div><label>Length (Haat)</label><input type="number" step="any" id="fabricHaat" value="29"></div>
+      <div><label>Reed</label><input type="number" step="any" id="reedValue" oninput="refreshAllRowThreads()"></div>
+      <div><label>Shrinkage (In)</label><input type="number" step="any" id="shrinkageInch" oninput="refreshAllRowThreads()"></div>
+      <div><label>Than</label><input type="number" step="any" id="thanValue" value="1"></div>
+      <div><label>Repeat</label><input type="number" step="any" id="designRepeat" value="1"></div>
+      <div><label>Hank Len</label><input type="number" step="any" id="hankLength"></div>
       <div><label>Unit</label><select id="globalUnit" onchange="refreshAllRowThreads()"><option value="inch">Inch</option><option value="cm">CM</option></select></div>
     </div>
 
@@ -193,7 +217,7 @@
       <div id="colourMasterSection" class="hidden card" style="margin-top:8px;">
           <div id="colourRows"></div>
           <button class="btn-outline" onclick="addColourRow()">+ Add Color Entry</button>
-          <button class="btn-green" id="syncBtn" onclick="saveColours()">Save & Sync Colors Across Folder</button>
+          <button class="btn-green" id="syncBtn" onclick="saveColours()">Save Colors</button>
       </div>
     </div>
   </div>
@@ -224,7 +248,7 @@ const YARN_LIB = {
 let activeDesignIdx = null; 
 let activeFolderId = null;
 let activeCopyTarget = null;
-let manualColors = []; // Local colors for uncategorized designs
+let manualColors = [];
 const STORAGE_KEY = 'app2_locked_v4';
 
 function getDB() { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{"designs":[], "folders":[], "folderColours":{}}'); }
@@ -235,7 +259,7 @@ function exportData() {
     const blob = new Blob([data], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a'); a.href = url;
-    a.download = `YarnPlanner_Backup_${new Date().toISOString().slice(0,10)}.json`;
+    a.download = `Backup_${new Date().toISOString().slice(0,10)}.json`;
     a.click();
 }
 
@@ -260,8 +284,7 @@ function goHome() {
 }
 
 function createNewDesign() {
-    activeDesignIdx = null;
-    activeFolderId = null;
+    activeDesignIdx = null; activeFolderId = null;
     document.getElementById('homePage').classList.add('hidden');
     document.getElementById('folderPage').classList.add('hidden');
     document.getElementById('editorPage').classList.remove('hidden');
@@ -307,6 +330,7 @@ function updateRowThreads(input) {
         wInp.value = unit === 'cm' ? (inch * 2.54).toFixed(2) : inch.toFixed(2);
     }
 }
+
 function refreshAllRowThreads() { document.querySelectorAll('.width').forEach(updateRowThreads); }
 
 function createRow(c='', w='', t='') {
@@ -315,8 +339,8 @@ function createRow(c='', w='', t='') {
         <div class="row-num"></div>
         <button class="seq-btn no-print-force" onclick="copyRowToBottom(this)">Seq</button>
         <select class="color-sel"></select>
-        <input class="width" type="number" step="any" inputmode="decimal" placeholder="W" oninput="updateRowThreads(this)" value="${w}">
-        <input class="threads" type="number" step="any" inputmode="decimal" placeholder="T" oninput="updateRowThreads(this)" value="${t}">
+        <input class="width" type="number" step="any" placeholder="W" oninput="updateRowThreads(this)" value="${w}">
+        <input class="threads" type="number" step="any" placeholder="T" oninput="updateRowThreads(this)" value="${t}">
         <button class="btn-outline no-print-force" onclick="addRowBelow(this)">+</button>
         <button class="btn-red no-print-force" onclick="this.parentElement.remove(); renumberRows();">×</button>`;
     fillColDropdown(r.querySelector('.color-sel'), c);
@@ -362,11 +386,11 @@ function addBlock(type, title, numRows, rowsData = [], atTop = false) {
 function removeBlock(btn) { const b = btn.closest('.block'); if (activeCopyTarget === b.querySelector('.row-container')) activeCopyTarget = null; b.remove(); renumberRows(); }
 
 function calculate() {
-    const repeat = parseFloat(document.getElementById('designRepeat').value) || 1, haat = parseFloat(document.getElementById('fabricHaat').value) || 0, than = parseFloat(document.getElementById('thanValue').value) || 1, dCount = document.getElementById('yarnCount').value;
-    let dye = {}, seq = 1, totalDSum = 0, totalBSum = 0, wHtml = `<table><tr><th>Seq</th><th>Colour</th><th>Threads</th></tr>`;
+    const repeat = parseFloat(document.getElementById('designRepeat').value) || 1, haat = parseFloat(document.getElementById('fabricHaat').value) || 0, than = parseFloat(document.getElementById('thanValue').value) || 1;
+    let dye = {}, seq = 1, totalDSum = 0, totalBSum = 0, wHtml = `<table><thead><tr><th>Seq</th><th>Colour</th><th>Threads</th></tr></thead><tbody>`;
     document.querySelectorAll('.block').forEach(b => {
         const type = b.dataset.type; let blockThreads = 0;
-        wHtml += `<tr style="background:#f8f9f9"><td colspan="3"><b>${type.toUpperCase()}</b></td></tr>`;
+        wHtml += `<tr style="background:#f8f9f9"><td colspan="3" style="text-align:left"><strong>${type.toUpperCase()}</strong></td></tr>`;
         b.querySelectorAll('.row').forEach(r => {
             const c = r.querySelector('.color-sel').value.trim(), t = parseFloat(r.querySelector('.threads').value) || 0;
             if(!c || t <= 0) return;
@@ -378,11 +402,11 @@ function calculate() {
         wHtml += `<tr class="subtotal-row"><td></td><td>Block Total</td><td>${blockThreads}</td></tr>`;
     });
     const grandTotal = (totalDSum * repeat) + totalBSum; 
-    wHtml += `<tr class="total-row"><td>Reed: ${document.getElementById('reedValue').value}</td><td>Drum: ${(grandTotal/(parseFloat(document.getElementById('reedValue').value)||1)).toFixed(2)}</td><td>Threads/Repeat: ${totalDSum}<br>(${totalDSum} × ${repeat}) + ${totalBSum} = ${grandTotal}</td></tr></table>`;
+    wHtml += `</tbody><tfoot><tr class="total-row"><td>Reed: ${document.getElementById('reedValue').value}</td><td>Drum: ${(grandTotal/(parseFloat(document.getElementById('reedValue').value)||1)).toFixed(2)}</td><td>Threads: (${totalDSum}×${repeat})+${totalBSum} = ${grandTotal}</td></tr></tfoot></table>`;
     document.getElementById('weaverTable').innerHTML = wHtml;
 
     let dSumRep = 0, dSumBord = 0, dSumThan = 0, dSumTotal = 0, dSumHanks = 0;
-    let dHtml = `<table><tr><th>Colour</th><th>In Repeat</th><th>In Border</th><th>Threads/Than</th><th>Total Threads</th><th>Hanks</th></tr>`;
+    let dHtml = `<table><thead><tr><th>Colour</th><th>In Repeat</th><th>In Border</th><th>Than</th><th>Total</th><th>Hanks</th></tr></thead><tbody>`;
     for(let c in dye) {
         let yarn = { h: parseFloat(document.getElementById('hankLength').value) || 3000 };
         for (let key in YARN_LIB) { if (c.toLowerCase().startsWith(key.toLowerCase())) { yarn = YARN_LIB[key]; break; } }
@@ -390,7 +414,7 @@ function calculate() {
         dHtml += `<tr><td style="text-align:left">${c}</td><td>${Math.round(dye[c].inRepeat)}</td><td>${Math.round(dye[c].inBorder)}</td><td>${Math.round(tpt)}</td><td>${Math.round(tt)}</td><td>${hanks.toFixed(2)}</td></tr>`;
         dSumRep += dye[c].inRepeat; dSumBord += dye[c].inBorder; dSumThan += tpt; dSumTotal += tt; dSumHanks += hanks;
     }
-    dHtml += `<tr class="total-row"><td>TOTAL</td><td>${Math.round(dSumRep)}</td><td>${Math.round(dSumBord)}</td><td>${Math.round(dSumThan)}</td><td>${Math.round(dSumTotal)}</td><td>${dSumHanks.toFixed(2)}</td></tr></table>`;
+    dHtml += `</tbody><tfoot><tr class="total-row"><td>TOTAL</td><td>${Math.round(dSumRep)}</td><td>${Math.round(dSumBord)}</td><td>${Math.round(dSumThan)}</td><td>${Math.round(dSumTotal)}</td><td>${dSumHanks.toFixed(2)}</td></tr></tfoot></table>`;
     document.getElementById('dyeTable').innerHTML = dHtml;
 }
 
@@ -404,8 +428,8 @@ function saveDesign(isUpdate) {
         blocks.push({ type: b.dataset.type, title: b.querySelector('.block-title span').innerText.split(' ')[0], rows });
     });
     const folderId = document.getElementById('designFolderSelect').value;
-    if(isUpdate && activeDesignIdx !== null) { db.designs[activeDesignIdx] = { name, folderId, config, blocks }; }
-    else { db.designs.push({ name, folderId, config, blocks }); }
+    if(isUpdate && activeDesignIdx !== null) db.designs[activeDesignIdx] = { name, folderId, config, blocks };
+    else db.designs.push({ name, folderId, config, blocks });
     saveDB(db); goHome();
 }
 
@@ -418,11 +442,10 @@ function loadHome() {
 
 function viewFolder(id) {
     activeFolderId = id; const db = getDB(), f = db.folders.find(x => x.id == id);
-    document.getElementById('homePage').classList.add('hidden');
-    document.getElementById('folderPage').classList.remove('hidden');
+    document.getElementById('homePage').classList.add('hidden'); document.getElementById('folderPage').classList.remove('hidden');
     document.getElementById('folderTitle').innerText = f.name;
     const container = document.getElementById('folderContent');
-    container.innerHTML = `<button class="btn-green no-print" style="margin-bottom:15px" onclick="createNewDesignFromFolder(${id})">+ New Design in Folder</button>`;
+    container.innerHTML = `<button class="btn-green no-print" style="margin-bottom:15px" onclick="createNewDesignFromFolder(${id})">+ New Design</button>`;
     db.designs.forEach((d, i) => { if(d.folderId == id) container.innerHTML += `<div class="card folder-item-card"><strong>${d.name}</strong><div style="display:flex; gap:5px; margin-top:8px;"><button class="btn-outline" onclick="openDesign(${i})">Edit</button><button class="btn-red" style="width:40px" onclick="deleteDesign(${i})">×</button></div></div>`; });
 }
 
@@ -430,37 +453,24 @@ function createNewDesignFromFolder(id) { activeFolderId = id; createNewDesign();
 
 function openDesign(idx) {
     const db = getDB(), d = db.designs[idx]; activeDesignIdx = idx; activeFolderId = d.folderId;
-    document.getElementById('homePage').classList.add('hidden'); 
-    document.getElementById('folderPage').classList.add('hidden');
-    document.getElementById('editorPage').classList.remove('hidden');
+    document.getElementById('homePage').classList.add('hidden'); document.getElementById('folderPage').classList.add('hidden'); document.getElementById('editorPage').classList.remove('hidden');
     updateFolderDropdown(); const c = d.config;
-    document.getElementById('designNameField').value = d.name;
-    document.getElementById('yarnCount').value = c.yarnCount; 
-    document.getElementById('fabricHaat').value = c.fabricHaat;
-    document.getElementById('reedValue').value = c.reedValue; 
-    document.getElementById('shrinkageInch').value = c.shrinkageInch;
-    document.getElementById('thanValue').value = c.thanValue; 
-    document.getElementById('hankLength').value = c.hankLength;
-    document.getElementById('designRepeat').value = c.designRepeat; 
-    document.getElementById('designFolderSelect').value = d.folderId || "";
-    manualColors = c.manualColors || [];
-    document.getElementById('blocks').innerHTML = ''; 
-    d.blocks.forEach(b => addBlock(b.type, b.title, 0, b.rows));
+    document.getElementById('designNameField').value = d.name; document.getElementById('yarnCount').value = c.yarnCount; 
+    document.getElementById('fabricHaat').value = c.fabricHaat; document.getElementById('reedValue').value = c.reedValue; 
+    document.getElementById('shrinkageInch').value = c.shrinkageInch; document.getElementById('thanValue').value = c.thanValue; 
+    document.getElementById('hankLength').value = c.hankLength; document.getElementById('designRepeat').value = c.designRepeat; 
+    document.getElementById('designFolderSelect').value = d.folderId || ""; manualColors = c.manualColors || [];
+    document.getElementById('blocks').innerHTML = ''; d.blocks.forEach(b => addBlock(b.type, b.title, 0, b.rows));
     loadColoursInEditor(); calculate();
 }
 
-function onFolderChangeInEditor() { 
-    activeFolderId = document.getElementById('designFolderSelect').value; 
-    loadColoursInEditor(); 
-    document.querySelectorAll('.color-sel').forEach(sel => fillColDropdown(sel, sel.value)); 
-}
+function onFolderChangeInEditor() { activeFolderId = document.getElementById('designFolderSelect').value; loadColoursInEditor(); document.querySelectorAll('.color-sel').forEach(sel => fillColDropdown(sel, sel.value)); }
 
 function loadColoursInEditor() { 
-    const db = getDB();
-    const colors = activeFolderId ? (db.folderColours[activeFolderId] || []) : manualColors;
+    const db = getDB(), colors = activeFolderId ? (db.folderColours[activeFolderId] || []) : manualColors;
     const container = document.getElementById('colourRows'); container.innerHTML = ''; 
     colors.forEach(c => addColourRow(c));
-    document.getElementById('syncBtn').innerText = activeFolderId ? "Save & Sync Colors Across Folder" : "Apply Manual Colors";
+    document.getElementById('syncBtn').innerText = activeFolderId ? "Sync Folder Colors" : "Apply Colors";
 }
 
 function toggleColourMaster() { const sec = document.getElementById('colourMasterSection'); sec.classList.toggle('hidden'); document.getElementById('toggleColBtn').innerText = sec.classList.contains('hidden') ? "Show Color Master" : "Hide Color Master"; }
@@ -477,37 +487,24 @@ function saveColours() {
         const oldVal = i.getAttribute('data-old-val'), newVal = i.value.trim();
         if(newVal) { newCols.push(newVal); if(oldVal && oldVal !== newVal) oldToNewMap[oldVal] = newVal; }
     });
-
     if(activeFolderId) {
         db.folderColours[activeFolderId] = newCols; 
-        db.designs.forEach(design => {
-            if(design.folderId == activeFolderId) {
-                design.blocks.forEach(block => { block.rows.forEach(row => { if(oldToNewMap[row.c]) row.c = oldToNewMap[row.c]; }); });
-            }
-        });
-        saveDB(db); alert("Folder Sync Complete.");
-    } else {
-        manualColors = newCols; alert("Manual Colors Applied to this design.");
-    }
-    
-    document.querySelectorAll('.color-sel').forEach(sel => {
-        const oldVal = sel.value; fillColDropdown(sel, oldToNewMap[oldVal] || oldVal);
-    });
+        db.designs.forEach(design => { if(design.folderId == activeFolderId) design.blocks.forEach(block => { block.rows.forEach(row => { if(oldToNewMap[row.c]) row.c = oldToNewMap[row.c]; }); }); });
+        saveDB(db); alert("Folder Colors Synced.");
+    } else { manualColors = newCols; alert("Local Colors Applied."); }
+    document.querySelectorAll('.color-sel').forEach(sel => { const oldVal = sel.value; fillColDropdown(sel, oldToNewMap[oldVal] || oldVal); });
     toggleColourMaster();
 }
 
 function fillColDropdown(sel, val) { 
-    const db = getDB();
-    const colors = activeFolderId ? (db.folderColours[activeFolderId] || []) : manualColors; 
-    sel.innerHTML = `<option value="">Color</option>`; 
-    colors.forEach(c => sel.innerHTML += `<option value="${c}">${c}</option>`); 
-    sel.value = val; 
+    const db = getDB(), colors = activeFolderId ? (db.folderColours[activeFolderId] || []) : manualColors; 
+    sel.innerHTML = `<option value="">Color</option>`; colors.forEach(c => sel.innerHTML += `<option value="${c}">${c}</option>`); sel.value = val; 
 }
 
 function createNewFolder() { const n = prompt("Folder Name:"); if(n) { const db = getDB(); db.folders.push({ id: Date.now(), name: n }); saveDB(db); loadHome(); } }
 function updateFolderDropdown() { const sel = document.getElementById('designFolderSelect'); sel.innerHTML = `<option value="">Uncategorized</option>`; getDB().folders.forEach(f => sel.innerHTML += `<option value="${f.id}">${f.name}</option>`); }
-function deleteDesign(i) { if(confirm("Delete Design?")) { const db = getDB(); db.designs.splice(i,1); saveDB(db); loadHome(); if(!document.getElementById('folderPage').classList.contains('hidden')) viewFolder(activeFolderId); } }
-function deleteFolder(id) { if(confirm("Delete folder? Designs will become Uncategorized.")) { const db = getDB(); db.folders = db.folders.filter(f => f.id != id); db.designs.forEach(d => { if(d.folderId == id) d.folderId = ""; }); saveDB(db); loadHome(); } }
+function deleteDesign(i) { if(confirm("Delete?")) { const db = getDB(); db.designs.splice(i,1); saveDB(db); loadHome(); if(!document.getElementById('folderPage').classList.contains('hidden')) viewFolder(activeFolderId); } }
+function deleteFolder(id) { if(confirm("Delete?")) { const db = getDB(); db.folders = db.folders.filter(f => f.id != id); db.designs.forEach(d => { if(d.folderId == id) d.folderId = ""; }); saveDB(db); loadHome(); } }
 
 loadHome();
 </script>
